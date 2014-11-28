@@ -226,11 +226,27 @@ end
             end
 
             serialized_data = association_serializer.serializable_object
-            key = association.root_key
-            if hash.has_key?(key)
-              hash[key].concat(serialized_data).uniq!
+
+            if !association.polymorphic?
+              key = association.root_key
+
+              if hash.has_key?(key)
+                hash[key].concat(serialized_data).uniq!
+              else
+                hash[key] = serialized_data
+              end
             else
-              hash[key] = serialized_data
+              serialized_data.each do |datum|
+                type = datum[:type]
+                key = type.to_s.pluralize
+                datum = datum[type]
+
+                if hash.has_key?(key)
+                  hash[key].push(datum).uniq!
+                else
+                  hash[key] = [datum]
+                end
+              end
             end
           end
         end
