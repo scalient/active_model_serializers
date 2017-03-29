@@ -12,7 +12,7 @@ module ActiveModel
       instrument do
         if root = options.fetch(:root, json_key)
           hash = { root => serializable_object(options) }
-          hash.merge!(serializable_data)
+          hash.merge!(serializable_data(options))
           hash
         else
           serializable_object(options)
@@ -24,8 +24,8 @@ module ActiveModel
       instrument { serializable_object(options) }
     end
 
-    def serializable_data
-      embedded_in_root_associations.tap do |hash|
+    def serializable_data(options = {})
+      embedded_in_root_associations(options).tap do |hash|
         if respond_to?(:meta) && meta
           hash[meta_key] = meta
         end
@@ -40,7 +40,7 @@ module ActiveModel
       end
     end
 
-    def embedded_in_root_associations
+    def embedded_in_root_associations(options = {})
       {}
     end
 

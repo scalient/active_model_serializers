@@ -204,7 +204,7 @@ end
       end
     end
 
-    def embedded_in_root_associations
+    def embedded_in_root_associations(options = {})
       associations = self.class._associations
       included_associations = filter(associations.keys)
       associations.each_with_object({}) do |(name, association), hash|
@@ -212,7 +212,7 @@ end
           association_serializer = build_serializer(association)
           # we must do this always because even if the current association is not
           # embedded in root, it might have its own associations that are embedded in root
-          hash.merge!(association_serializer.embedded_in_root_associations) do |key, oldval, newval|
+          hash.merge!(association_serializer.embedded_in_root_associations(options)) do |key, oldval, newval|
             if oldval.respond_to?(:to_ary)
               [oldval, newval].flatten.uniq
             else
@@ -225,7 +225,7 @@ end
               hash = hash[association.embed_in_root_key] ||= {}
             end
 
-            serialized_data = association_serializer.serializable_object
+            serialized_data = association_serializer.serializable_object(options)
 
             if !association.polymorphic?
               key = association.root_key

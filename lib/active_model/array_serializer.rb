@@ -46,9 +46,9 @@ module ActiveModel
     end
     alias_method :serializable_array, :serializable_object
 
-    def embedded_in_root_associations
+    def embedded_in_root_associations(options = {})
       @object.each_with_object({}) do |item, hash|
-        serializer_for(item).embedded_in_root_associations.each_pair do |type, objects|
+        serializer_for(item).embedded_in_root_associations(options).each_pair do |type, objects|
           next if !objects || objects.flatten.empty?
 
           if hash.has_key?(type)
